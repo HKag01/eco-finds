@@ -1,39 +1,28 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import { getCookie } from '@/lib/utils'
 import { toast } from 'sonner'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 
-interface Product {
-  id: number
+interface OrderItem {
+  id: string
   title: string
   price: number
   imageUrl: string
-  category: string
-  seller: {
-    firstName: string
-    lastName: string
-    email: string
-  }
-}
-
-interface OrderItem {
-  id: number
-  quantity: number
-  price: number
-  product: Product
+  orderId: string
+  productId?: string | null
 }
 
 interface Purchase {
-  id: number
+  id: string
   total: number
-  status: string
   createdAt: string
+  userId: string
   items: OrderItem[]
 }
 
@@ -131,7 +120,7 @@ export default function OrdersPage() {
             <div key={purchase.id} className="border border-border rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold text-lg">Order #{purchase.id}</h3>
+                  <h3 className="font-semibold text-lg">Order #{purchase.id.slice(0, 8)}</h3>
                   <p className="text-sm text-muted-foreground">
                     Placed on {formatDate(purchase.createdAt)}
                   </p>
@@ -141,7 +130,7 @@ export default function OrdersPage() {
                     ${purchase.total.toFixed(2)}
                   </div>
                   <div className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full inline-block">
-                    {purchase.status}
+                    Completed
                   </div>
                 </div>
               </div>
@@ -150,25 +139,22 @@ export default function OrdersPage() {
                 {purchase.items.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 bg-background border border-border rounded-lg">
                     <img
-                      src={item.product.imageUrl || '/api/placeholder/80/80'}
-                      alt={item.product.title}
+                      src={item.imageUrl || '/api/placeholder/80/80'}
+                      alt={item.title}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-foreground line-clamp-1">
-                        {item.product.title}
+                        {item.title}
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        Sold by {item.product.seller.firstName} {item.product.seller.lastName}
+                        Order item
                       </p>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {item.product.category.charAt(0).toUpperCase() + item.product.category.slice(1)}
+                        Product ID: {item.productId ? item.productId.slice(0, 8) : 'N/A'}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-muted-foreground">
-                        Qty: {item.quantity}
-                      </div>
                       <div className="font-semibold">
                         ${item.price.toFixed(2)}
                       </div>

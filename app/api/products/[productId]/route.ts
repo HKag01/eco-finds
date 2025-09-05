@@ -5,11 +5,11 @@ import { updateProductSchema } from "@/lib/validators";
 import { ZodError } from "zod";
 
 interface Params {
-	params: { productId: string };
+	params: Promise<{ productId: string }>;
 }
 
 export async function GET(req: Request, { params }: Params) {
-	const { productId } = params;
+	const { productId } = await params;
 
 	try {
 		const product = await prisma.product.findUnique({
@@ -21,7 +21,7 @@ export async function GET(req: Request, { params }: Params) {
 		}
 
 		return NextResponse.json(product);
-	} catch (error) {
+	} catch {
 		return NextResponse.json(
 			{ error: "An unexpected error occurred." },
 			{ status: 500 }
@@ -30,7 +30,7 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 export async function PUT(req: Request, { params }: Params) {
-	const { productId } = params;
+	const { productId } = await params;
 	const userId = await getUserIdFromToken();
 	if (!userId) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -69,7 +69,7 @@ export async function PUT(req: Request, { params }: Params) {
 }
 
 export async function DELETE(req: Request, { params }: Params) {
-	const { productId } = params;
+	const { productId } = await params;
 	const userId = await getUserIdFromToken();
 	if (!userId) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -97,7 +97,7 @@ export async function DELETE(req: Request, { params }: Params) {
 			{ message: "Product deleted successfully" },
 			{ status: 200 }
 		);
-	} catch (error) {
+	} catch {
 		return NextResponse.json(
 			{ error: "An unexpected error occurred." },
 			{ status: 500 }

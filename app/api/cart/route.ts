@@ -22,7 +22,7 @@ export async function GET() {
 		});
 
 		return NextResponse.json(cartItems);
-	} catch (error) {
+	} catch {
 		return NextResponse.json(
 			{ error: "An unexpected error occurred." },
 			{ status: 500 }

@@ -69,8 +69,9 @@ export async function GET(req: Request) {
 
 		return NextResponse.json(products);
 	} catch (error) {
+		console.error('Error fetching products:', error);
 		return NextResponse.json(
-			{ error: "An unexpected error occurred." },
+			{ error: "Failed to fetch products" },
 			{ status: 500 }
 		);
 	}

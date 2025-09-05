@@ -5,6 +5,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
+interface NavDockProps {
+  isAuthenticated?: boolean
+}
+
 const navItems = [
   {
     href: "/",
@@ -23,11 +27,19 @@ const navItems = [
   },
 ];
 
-export default function NavDock() {
+export default function NavDock({ isAuthenticated = false }: NavDockProps) {
   const pathname = usePathname()
 
+  // Function to handle navigation for unauthenticated users
+  const getNavigationHref = (href: string) => {
+    if (!isAuthenticated && (href === '/cart' || href === '/profile')) {
+      return `/login?redirect=${href}`
+    }
+    return href
+  }
+
   return (
-    <nav className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
+    <nav className="border-t bg-background w-full">
       <div className="flex h-auto p-0 w-full">
         {navItems.map((item) => {
           const isActive = pathname === item.href
@@ -36,7 +48,7 @@ export default function NavDock() {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={getNavigationHref(item.href)}
               className={cn(
                 "relative flex-col rounded-none px-4 py-3 text-xs flex items-center flex-1",
                 "after:absolute after:inset-x-0 after:top-0 after:h-0.5",

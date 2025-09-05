@@ -157,7 +157,7 @@ export default function EditProfilePage() {
 
 
       toast.success('Profile updated')
-      router.push('/(dashboard)/profile')
+      router.push('/profile')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to update profile'
       toast.error(msg)

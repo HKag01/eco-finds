@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon, CircleNotchIcon } from "@phosphor-icons/react";
 import { Button } from '@/components/ui/button'
@@ -17,8 +17,10 @@ interface LoginFormData {
 }
 
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -75,8 +77,8 @@ export default function LoginPage() {
         document.cookie = `token=${response.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
         document.cookie = `user=${encodeURIComponent(JSON.stringify(response.data.user))}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
         
-        // On success, redirect to dashboard
-        router.push('/')
+        // On success, redirect to intended route or homepage
+        router.push(redirectTo)
       } else {
         toast.error('Login failed. Please try again.')
       }
@@ -192,5 +194,17 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

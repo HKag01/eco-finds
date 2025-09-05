@@ -33,7 +33,14 @@ export async function POST(req: Request) {
 			expiresIn: "7d",
 		});
 
-		const { password: _, ...userWithoutPassword } = user;
+		const userWithoutPassword = {
+			id: user.id,
+			email: user.email,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			createdAt: user.createdAt,
+			updatedAt: user.updatedAt,
+		};
 
 		return NextResponse.json(
 			{ user: userWithoutPassword, token },

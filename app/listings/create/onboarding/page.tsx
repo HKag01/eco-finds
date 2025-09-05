@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { Dropzone, DropzoneContent, DropzoneEmptyState } from '@/components/ui/shadcn-io/dropzone'
-import { UploadIcon, XIcon } from 'lucide-react'
+import { UploadIcon, XIcon } from '@phosphor-icons/react'
 interface ListingData {
   title: string
   description: string
@@ -75,6 +75,15 @@ export default function ListingOnboardingPage() {
     return true
   }
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = error => reject(error)
+    })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -85,15 +94,25 @@ export default function ListingOnboardingPage() {
     setIsLoading(true)
 
     try {
-      // Here you would typically upload the image and save the listing data
-      // For now, we'll simulate the process and then redirect to the next step
+      // Convert file to base64 for temporary storage
+      const fileBase64 = files && files[0] ? await fileToBase64(files[0]) : null
+      
+      // Store the onboarding data in localStorage for the next step
+      const onboardingData = {
+        title: formData.title,
+        description: formData.description,
+        imagePreview: fileBase64,
+        imageFile: files?.[0]?.name
+      }
+      
+      localStorage.setItem('onboardingData', JSON.stringify(onboardingData))
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500))
       
       toast.success('Listing details saved!')
       
-      // Navigate to the next step (to be implemented later)
+      // Navigate to the next step
       router.push('/listings/create')
       
     } catch (error: unknown) {

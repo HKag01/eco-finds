@@ -178,6 +178,19 @@ export default function ProfilePage() {
           </Button>
         </div>
 
+        {/* My Listings */}
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <div className="font-medium">My Listings</div>
+            <div className="text-sm text-muted-foreground">
+              Manage your product listings
+            </div>
+          </div>
+          <Button asChild>
+            <Link href="/listings/my">View</Link>
+          </Button>
+        </div>
+
         {/* Theme selector */}
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="mr-4">

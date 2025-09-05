@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, type FormEvent, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react'
 
@@ -19,8 +19,10 @@ interface SignupFormData {
   password: string
 }
 
-export default function SignupPage() {
+function SignupPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const [formData, setFormData] = useState<SignupFormData>({
     firstName: '',
@@ -91,7 +93,7 @@ export default function SignupPage() {
       if (response.data?.token) {
         document.cookie = `token=${response.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
         document.cookie = `user=${encodeURIComponent(JSON.stringify(response.data.user))}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
-        router.push('/dashboard')
+        router.push(redirectTo)
       } else {
         toast.error('Sign up failed. Please try again.')
       }
@@ -229,5 +231,17 @@ export default function SignupPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <SignupPageContent />
+    </Suspense>
   );
 }

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
 interface Params {
-	params: { productId: string };
+	params: Promise<{ productId: string }>;
 }
 
 export async function DELETE(req: Request, { params }: Params) {

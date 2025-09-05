@@ -1,173 +1,84 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
-
-// import { NavMain } from "@/components/nav-main";
-// import { NavProjects } from "@/components/nav-projects";
-// import { NavUser } from "@/components/nav-user";
-// import { TeamSwitcher } from "@/components/team-switcher";
+import { ShoppingCartIcon, HouseIcon, UserCircleIcon } from "@phosphor-icons/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { NavUser } from "./nav-user";
+import { Logo } from "./logo";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  isAuthenticated?: boolean
+}
+
+// Navigation items from NavDock
+const navItems = [
+  {
+    href: "/",
+    icon: HouseIcon,
+    label: "Home",
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-};
+  {
+    href: "/cart",
+    icon: ShoppingCartIcon,
+    label: "Cart",
+  },
+  {
+    href: "/profile",
+    icon: UserCircleIcon,
+    label: "Profile",
+  },
+];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ isAuthenticated = false, ...props }: AppSidebarProps) {
+  const pathname = usePathname();
+
+  // Function to handle navigation for unauthenticated users
+  const getNavigationHref = (href: string) => {
+    if (!isAuthenticated && (href === '/cart' || href === '/profile')) {
+      return `/login?redirect=${href}`
+    }
+    return href
+  }
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      {/* <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-      </SidebarHeader> */}
+    <Sidebar collapsible="icon" {...props} className="px-4">
+      <SidebarHeader>
+        <div className="flex items-center justify-center p-2">
+          <Logo size="md" />
+        </div>
+      </SidebarHeader>
       <SidebarContent>
+        <SidebarMenu>
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton asChild isActive={isActive} className="py-6 text-lg px-4">
+                  <Link href={getNavigationHref(item.href)}>
+                    <Icon
+                      size={18}
+                      weight={isActive ? "fill" : "regular"}
+                      aria-hidden="true"
+                    />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
