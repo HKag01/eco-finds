@@ -12,8 +12,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SunIcon, MoonIcon, DesktopIcon } from "@phosphor-icons/react";
-import { PencilSimple } from "@phosphor-icons/react";
+import {
+  SunIcon,
+  MoonIcon,
+  DesktopIcon,
+  PencilSimpleIcon,
+} from "@phosphor-icons/react";
 type Profile = {
   id?: string
   email: string
@@ -69,6 +73,7 @@ export default function ProfilePage() {
       setProfile(cookieProfile)
       const initialFullName = `${cookieProfile.firstName || ''} ${cookieProfile.lastName || ''}`.trim()
       setFullNameDisplay(initialFullName)
+      setLoading(false) // Stop loading immediately when cookie data is available
     }
 
     const token = getCookie('token')
@@ -97,7 +102,12 @@ export default function ProfilePage() {
       .catch(() => {
         // no-op; we already have cookie fallback
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        // Only set loading to false if no cookie data was available initially
+        if (!cookieProfile) {
+          setLoading(false)
+        }
+      })
 
     return () => controller.abort()
   }, [])
@@ -137,7 +147,7 @@ export default function ProfilePage() {
         </div>
         <Button asChild size="icon" variant="ghost">
           <Link href="/profile/edit" aria-label="Edit profile">
-            <PencilSimple size={20} aria-hidden="true" />
+            <PencilSimpleIcon size={20} aria-hidden="true" />
           </Link>
         </Button>
       </div>
