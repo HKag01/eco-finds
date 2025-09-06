@@ -22,6 +22,12 @@ enum ProductCategory {
   OTHER
 }
 
+enum ProductCondition {
+  POOR
+  GOOD
+  EXCELLENT
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -46,6 +52,21 @@ model Product {
   category    ProductCategory
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+
+  quantity                    Int              @default(1)
+  condition                   ProductCondition
+  yearOfManufacture           Int? // Optional
+  brand                       String?
+  model                       String?
+  length                      Float?
+  width                       Float?
+  height                      Float?
+  weight                      Float?
+  material                    String?
+  color                       String?
+  hasOriginalPackaging        Boolean          @default(false)
+  hasManual                   Boolean          @default(false)
+  workingConditionDescription String?
 
   seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId String
