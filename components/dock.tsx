@@ -1,27 +1,27 @@
 'use client'
 
-import { BoxIcon, HouseIcon, PanelsTopLeftIcon } from "lucide-react"
+import { ShoppingCartIcon, HouseIcon, UserCircleIcon  } from "@phosphor-icons/react";
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   {
-    href: "/dashboard",
+    href: "/",
     icon: HouseIcon,
-    label: "Dashboard"
+    label: "Home",
   },
   {
-    href: "/products",
-    icon: PanelsTopLeftIcon,
-    label: "Products"
+    href: "/cart",
+    icon: ShoppingCartIcon,
+    label: "Cart",
   },
   {
     href: "/profile",
-    icon: BoxIcon,
-    label: "Profile"
-  }
-]
+    icon: UserCircleIcon,
+    label: "Profile",
+  },
+];
 
 export default function NavDock() {
   const pathname = usePathname()
@@ -48,6 +48,7 @@ export default function NavDock() {
               <Icon
                 className="mb-1.5"
                 size={18}
+                weight={isActive ? "fill" : "regular"}
                 aria-hidden="true"
               />
               {item.label}
