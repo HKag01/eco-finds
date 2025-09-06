@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import { Arvo, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  variable: "--font-sans",
 });
 
 const arvo = Arvo({
   weight: ["400", "700"],
   subsets: ["latin"],
+  variable: "--font-serif",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.className} ${arvo.className} antialiased`}
+      className={`${plusJakartaSans.variable} ${arvo.variable} antialiased`}
       suppressHydrationWarning
     >
       <body>
@@ -37,6 +40,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>
