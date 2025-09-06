@@ -5,6 +5,7 @@ import { createProductSchema } from "@/lib/validators";
 import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 import { ProductCategory } from "@prisma/client";
+import { generateBlurHash } from "@/lib/blurhash";
 
 export async function POST(req: Request) {
 	const sellerId = await getUserIdFromToken();
@@ -14,18 +15,15 @@ export async function POST(req: Request) {
 
 	try {
 		const body = await req.json();
-		const { title, description, price, imageUrl, category } =
-			createProductSchema.parse(body);
+		const productData = createProductSchema.parse(body);
+
+		const blurHash = await generateBlurHash(productData.imageUrl);
 
 		const newProduct = await prisma.product.create({
 			data: {
-				title,
-				description,
-				price,
-				imageUrl,
-				category,
+				...productData,
 				sellerId,
-				blurHash: "placeholder_blurhash",
+				blurHash,
 			},
 		});
 
