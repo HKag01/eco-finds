@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/logo'
 import { cn } from '@/lib/utils'
+import axios from 'axios'
 
 const loginSchema = z.object({
   email: z
@@ -77,6 +78,7 @@ export default function LoginPage() {
       return
     }
 
+
     setIsLoading(true)
     setErrors({})
 
@@ -86,19 +88,27 @@ export default function LoginPage() {
         email: formData.email.toLowerCase().trim(),
         password: formData.password
       }
-      
-      console.log('Login attempt for:', loginData.email)
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const response = await axios.post("/api/auth/login", { ...loginData })
       
-      // On success, redirect to dashboard
-      router.push('/dashboard')
+      if (response.data.token) {
+        // Store the token in cookies for authentication
+        document.cookie = `token=${response.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
+        document.cookie = `user=${encodeURIComponent(JSON.stringify(response.data.user))}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
+        
+        // On success, redirect to dashboard
+        router.push('/dashboard')
+      } else {
+        setErrors({ 
+          submit: 'Login failed. Please try again.' 
+        })
+      }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error)
+      const errorMessage = error.response?.data?.error || 'Invalid email or password. Please try again.'
       setErrors({ 
-        submit: 'Invalid email or password. Please try again.' 
+        submit: errorMessage
       })
     } finally {
       setIsLoading(false)
