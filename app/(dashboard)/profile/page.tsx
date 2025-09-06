@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -61,6 +62,7 @@ function initialsFrom(firstName?: string, lastName?: string, email?: string): st
 }
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<Partial<Profile> | null>(null)
   const [fullNameDisplay, setFullNameDisplay] = useState('')
   const [loading, setLoading] = useState(true)
@@ -117,6 +119,15 @@ export default function ProfilePage() {
     [profile?.firstName, profile?.lastName, profile?.email],
   )
 
+  const handleLogout = () => {
+    // Clear all cookies
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
+    document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
+    
+    // Redirect to login page
+    router.push('/login')
+  }
+
   return (
     <div className="mx-auto max-w-2xl p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -163,7 +174,7 @@ export default function ProfilePage() {
             </div>
           </div>
           <Button asChild>
-            <Link href="/dashboard/orders">View</Link>
+            <Link href="/orders">View</Link>
           </Button>
         </div>
 
@@ -230,6 +241,19 @@ export default function ProfilePage() {
               </TooltipProvider>
             </TabsList>
           </Tabs>
+        </div>
+
+        {/* Logout */}
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <div className="font-medium">Sign out</div>
+            <div className="text-sm text-muted-foreground">
+              Sign out of your account
+            </div>
+          </div>
+          <Button variant="destructive" onClick={handleLogout}>
+            Sign out
+          </Button>
         </div>
       </div>
     </div>

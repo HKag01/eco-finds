@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getUserIdFromToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getUserIdFromToken } from "@/lib/auth";
 
 export async function GET() {
 	const userId = await getUserIdFromToken();
@@ -9,20 +9,43 @@ export async function GET() {
 	}
 
 	try {
-		const orders = await prisma.order.findMany({
-			where: { userId },
+		const purchases = await prisma.order.findMany({
+			where: { 
+				userId: userId,
+				status: 'COMPLETED'
+			},
 			include: {
-				items: true,
+				items: {
+					include: {
+						product: {
+							select: {
+								id: true,
+								title: true,
+								price: true,
+								imageUrl: true,
+								category: true,
+								seller: {
+									select: {
+										firstName: true,
+										lastName: true,
+										email: true
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			orderBy: {
-				createdAt: "desc",
-			},
+				createdAt: 'desc'
+			}
 		});
 
-		return NextResponse.json(orders);
+		return NextResponse.json(purchases);
 	} catch (error) {
+		console.error('Error fetching purchases:', error);
 		return NextResponse.json(
-			{ error: "An unexpected error occurred." },
+			{ error: "Failed to fetch purchases" },
 			{ status: 500 }
 		);
 	}
