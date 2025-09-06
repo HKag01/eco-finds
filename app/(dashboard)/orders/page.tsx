@@ -122,7 +122,7 @@ export default function OrdersPage() {
             Start shopping to see your order history here
           </p>
           <Button asChild>
-            <Link href="/dashboard">Browse Products</Link>
+            <Link href="/">Browse Products</Link>
           </Button>
         </div>
       ) : (

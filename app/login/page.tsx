@@ -76,7 +76,7 @@ export default function LoginPage() {
         document.cookie = `user=${encodeURIComponent(JSON.stringify(response.data.user))}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`
         
         // On success, redirect to dashboard
-        router.push('/dashboard')
+        router.push('/')
       } else {
         toast.error('Login failed. Please try again.')
       }
