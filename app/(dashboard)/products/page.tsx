@@ -62,7 +62,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto p-4 pb-20 md:pb-4">
       <div>products-ahh-page</div>
     </div>
   );
