@@ -22,3 +22,4 @@ export async function getUserIdFromToken(): Promise<string | null> {
 		return null;
 	}
 }
+
