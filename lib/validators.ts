@@ -5,7 +5,7 @@ export const registerSchema = z.object({
 	email: z.string().email({ message: "Invalid email address" }),
 	password: z
 		.string()
-		.min(8, { message: "Password must be at least 6 characters long" }),
+		.min(8, { message: "Password must be at least 8 characters long" }),
 	firstName: z.string().min(1, { message: "First name is required" }),
 	lastName: z.string().min(1, { message: "Last name is required" }),
 });
@@ -51,4 +51,9 @@ export const updateProductSchema = z.object({
 		.optional(),
 	imageUrl: z.string().url({ message: "Invalid image URL" }).optional(),
 	category: z.nativeEnum(ProductCategory).optional(),
+});
+
+export const cartItemSchema = z.object({
+	productId: z.string().uuid({ message: "Invalid product ID" }),
+	quantity: z.number().int().min(1, { message: "Quantity must be at least 1" }),
 });
