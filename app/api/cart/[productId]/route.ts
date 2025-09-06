@@ -1,4 +1,3 @@
-// /app/api/cart/[productId]/route.ts
 import { NextResponse } from "next/server";
 import { getUserIdFromToken } from "@/lib/auth";
 import prisma from "@/lib/prisma";
