@@ -7,8 +7,8 @@ import { z } from 'zod'
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { FloatingInput } from '@/components/ui/floating-input'
-import { FloatingPasswordInput } from '@/components/ui/floating-password-input'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/logo'
 import { cn } from '@/lib/utils'
 
@@ -40,6 +40,7 @@ export default function LoginPage() {
     password: ''
   })
   const [errors, setErrors] = useState<FormErrors>({})
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleInputChange = (field: keyof LoginFormData, value: string) => {
@@ -59,7 +60,7 @@ export default function LoginPage() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: FormErrors = {}
-        error.errors.forEach((err) => {
+        error.issues.forEach((err: z.ZodIssue) => {
           const path = err.path[0] as keyof FormErrors
           newErrors[path] = err.message
         })
@@ -145,18 +146,21 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="space-y-4">
-            <div>
-              <FloatingInput
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
-                label="Email Address"
                 autoComplete="email"
                 required
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                error={errors.email}
+                className={cn(
+                  errors.email && "border-destructive focus-visible:border-destructive"
+                )}
+                placeholder="Enter your email address"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
               />
@@ -168,19 +172,38 @@ export default function LoginPage() {
               )}
             </div>
 
-            <div>
-              <FloatingPasswordInput
-                id="password"
-                name="password"
-                label="Password"
-                autoComplete="current-password"
-                required
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                error={errors.password}
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : undefined}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={cn(
+                    "pr-10",
+                    errors.password && "border-destructive focus-visible:border-destructive"
+                  )}
+                  placeholder="Enter your password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p id="password-error" className="mt-1 text-sm text-destructive flex items-center">
                   <AlertCircle className="h-4 w-4 mr-1" />

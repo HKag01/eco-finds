@@ -8,8 +8,8 @@ import bcrypt from 'bcryptjs'
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { FloatingInput } from '@/components/ui/floating-input'
-import { FloatingPasswordInput } from '@/components/ui/floating-password-input'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/logo'
 import { cn } from '@/lib/utils'
 
@@ -59,6 +59,8 @@ export default function SignupPage() {
     confirmPassword: ''
   })
   const [errors, setErrors] = useState<FormErrors>({})
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
     score: 0,
@@ -141,7 +143,7 @@ export default function SignupPage() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: FormErrors = {}
-        error.errors.forEach((err) => {
+        error.issues.forEach((err: z.ZodIssue) => {
           const path = err.path[0] as keyof FormErrors
           newErrors[path] = err.message
         })
@@ -245,18 +247,21 @@ export default function SignupPage() {
             </div>
           )}
 
-          <div className="space-y-4">
-            <div>
-              <FloatingInput
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="displayName">Display Name</Label>
+              <Input
                 id="displayName"
                 name="displayName"
                 type="text"
-                label="Display Name"
                 autoComplete="name"
                 required
                 value={formData.displayName}
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
-                error={errors.displayName}
+                className={cn(
+                  errors.displayName && "border-destructive focus-visible:border-destructive"
+                )}
+                placeholder="Enter your display name"
                 aria-invalid={!!errors.displayName}
                 aria-describedby={errors.displayName ? "displayName-error" : undefined}
               />
@@ -268,17 +273,20 @@ export default function SignupPage() {
               )}
             </div>
 
-            <div>
-              <FloatingInput
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
-                label="Email Address"
                 autoComplete="email"
                 required
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                error={errors.email}
+                className={cn(
+                  errors.email && "border-destructive focus-visible:border-destructive"
+                )}
+                placeholder="Enter your email address"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
               />
@@ -290,19 +298,38 @@ export default function SignupPage() {
               )}
             </div>
 
-            <div>
-              <FloatingPasswordInput
-                id="password"
-                name="password"
-                label="Password"
-                autoComplete="new-password"
-                required
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                error={errors.password}
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : "password-help"}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={cn(
+                    "pr-10",
+                    errors.password && "border-destructive focus-visible:border-destructive"
+                  )}
+                  placeholder="Create a strong password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : "password-help"}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
               
               {/* Password Strength Indicator */}
               {formData.password && (
@@ -348,27 +375,45 @@ export default function SignupPage() {
               )}
             </div>
 
-            <div>
-              <FloatingPasswordInput
-                id="confirmPassword"
-                name="confirmPassword"
-                label="Confirm Password"
-                autoComplete="new-password"
-                required
-                value={formData.confirmPassword}
-                onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                error={errors.confirmPassword}
-                className={cn(
-                  !errors.confirmPassword && formData.confirmPassword && formData.password === formData.confirmPassword && "border-green-500"
-                )}
-                rightIcon={
-                  formData.confirmPassword && formData.password === formData.confirmPassword ? (
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  className={cn(
+                    "pr-10",
+                    errors.confirmPassword && "border-destructive focus-visible:border-destructive",
+                    !errors.confirmPassword && formData.confirmPassword && formData.password === formData.confirmPassword && "border-green-500"
+                  )}
+                  placeholder="Confirm your password"
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+                {/* Password Match Indicator */}
+                {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                  <div className="absolute inset-y-0 right-8 flex items-center">
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  ) : null
-                }
-                aria-invalid={!!errors.confirmPassword}
-                aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
-              />
+                  </div>
+                )}
+              </div>
               {errors.confirmPassword && (
                 <p id="confirmPassword-error" className="mt-1 text-sm text-destructive flex items-center">
                   <AlertCircle className="h-4 w-4 mr-1" />
