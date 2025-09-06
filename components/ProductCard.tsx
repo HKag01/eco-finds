@@ -1,7 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { getCookie } from '@/lib/utils'
 
 interface Product {
   id: number
@@ -20,9 +24,38 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log('Add to cart:', product.id)
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAddingToCart(true)
+      
+      const token = getCookie('token')
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
+      const response = await axios.post(
+        "/api/cart",
+        {
+          productId: product.id,
+          quantity: 1,
+        },
+        {headers}
+      );
+      
+      if (response.status === 200) {
+        toast.success('Product added to cart!')
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error || 'Failed to add product to cart'
+        toast.error(errorMessage)
+      } else {
+        toast.error('Failed to add product to cart')
+      }
+    } finally {
+      setIsAddingToCart(false)
+    }
   }
 
   return (
@@ -67,8 +100,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={handleAddToCart}
           className="w-full"
           size="sm"
+          disabled={isAddingToCart}
         >
-          Add to Cart
+          {isAddingToCart ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+              Adding...
+            </div>
+          ) : (
+            'Add to Cart'
+          )}
         </Button>
       </div>
     </div>
